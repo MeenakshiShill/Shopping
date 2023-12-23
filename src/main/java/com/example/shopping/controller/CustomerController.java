@@ -21,42 +21,67 @@ import com.example.shopping.sevice.CustomerService;
 @RestController
 @RequestMapping("/Customer")
 public class CustomerController {
-	
-	@Autowired
-	private CustomerService customerService;
-	
-	
-	@GetMapping("/getAll")
-	public ResponseEntity<Object> getAllcustomer(){
-		List<Customer> customers =customerService.getAllCustomer();
-		return new ResponseEntity<>(customers,HttpStatus.OK);
-	}
-	
-	
-	@GetMapping("/getById/{CustomerId}")
-	public Optional<Customer> getById(@PathVariable("CustomerId") int CustomerId ){
-		return customerService.GetByCustomerId(CustomerId);
-	} 
-	
-	@PostMapping("/Create")
-	public String createCustomer(@RequestBody Customer customer ) {
-	customerService.CreateCustomer(customer);
-		return "Creted";
-	}
-	
-	@PutMapping("/Update/{CustomerId}")
-	public String updateCustomer(@RequestBody Customer customer,@PathVariable("CustomerId") int CustomerId) {
-		String result = customerService.UpdateCustomer(customer, CustomerId);
-		return result;
-	}
-	
-	@DeleteMapping("/Delete/{CustomerId}")
-	public String deleteCustomer(@PathVariable("CustomerId") int CustomerId) {
-		String delete = customerService.DeleteCustomer(CustomerId);
-		return delete;
-	}
-	
 
-	
+    @Autowired
+    private CustomerService customerService;
 
+    @GetMapping("/getAll")
+    public ResponseEntity<Object> getAllCustomer() {
+        try {
+            List<Customer> customers = customerService.getAllCustomer();
+            return new ResponseEntity<>(customers, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception or return a custom error response
+            return new ResponseEntity<>("An error occurred while fetching customers", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getById/{CustomerId}")
+    public ResponseEntity<Object> getById(@PathVariable("CustomerId") int CustomerId) {
+        try {
+            Optional<Customer> customer = customerService.GetByCustomerId(CustomerId);
+            if (customer.isPresent()) {
+                return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Customer not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            // Log the exception or return a custom error response
+            return new ResponseEntity<>("An error occurred while fetching the customer", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/Create")
+    public ResponseEntity<Object> createCustomer(@RequestBody Customer customer) {
+        try {
+            customerService.CreateCustomer(customer);
+            return new ResponseEntity<>("Customer created successfully", HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Log the exception or return a custom error response
+            return new ResponseEntity<>("An error occurred while creating the customer", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/Update/{CustomerId}")
+    public ResponseEntity<Object> updateCustomer(@RequestBody Customer customer, @PathVariable("CustomerId") int CustomerId) {
+        try {
+            String result = customerService.UpdateCustomer(customer, CustomerId);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception or return a custom error response
+            return new ResponseEntity<>("An error occurred while updating the customer", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/Delete/{CustomerId}")
+    public ResponseEntity<Object> deleteCustomer(@PathVariable("CustomerId") int CustomerId) {
+        try {
+            String delete = customerService.DeleteCustomer(CustomerId);
+            return new ResponseEntity<>(delete, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception or return a custom error response
+            return new ResponseEntity<>("An error occurred while deleting the customer", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
+
